@@ -6,6 +6,7 @@ import com.example.demo.model.Participant;
 import com.example.demo.model.Ticket;
 import com.example.demo.repository.EventRepository;
 import com.example.demo.repository.ParticipantRepository;
+import com.vladmihalcea.hibernate.type.json.JsonStringType;
 
 import java.util.List;
 
@@ -62,12 +63,16 @@ public class EventController {
 
 	@GetMapping("/participant-by-event-country")
     public List<Participant> getParticipantByEventLocation(@RequestParam String country) { 
-//		Specifications<Participant> spec = Specifications.where(getEventCountry(country));		
-//        return participantRepository.findAll(spec);
-		return participantRepository.getParticipantByEventLocation(country);
+		Specifications<Participant> spec = Specifications.where(getEventCountry(country));		
+        return participantRepository.findAll(spec);
+//		return participantRepository.getParticipantByEventLocation(country);
     }
 	
 	private static Specification<Participant> getEventCountry(String country) {
-        return (Root<Participant> root, CriteriaQuery<?> cq, CriteriaBuilder cb) -> cb.equal(root.get("location").get("country"), country);
+        return (Root<Participant> root, CriteriaQuery<?> cq, CriteriaBuilder cb) -> 
+        		cb.equal(cb.function("JSON_EXTRACT", String.class, root.get("event").get("location"), cb.literal("$.country")), country);
     }
+	
+	
+	
 }
