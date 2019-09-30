@@ -8,6 +8,7 @@ import com.example.demo.repository.EventRepository;
 import com.example.demo.repository.ParticipantRepository;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -32,7 +33,9 @@ public class EventController {
 
 	@PostMapping("/participant")
 	public void create() {
-		long j = 2;
+		long j = 1;
+		List<Event> events = new ArrayList<Event>();
+		List<Participant> participants = new ArrayList<Participant>();
 		for (int i = 0; i <= 100000; i++) {
 			Location location = new Location();
 			location.setCountry(RandomStringUtils.randomAlphabetic(10));
@@ -41,7 +44,7 @@ public class EventController {
 			Event event = new Event();
 			event.setId(j);
 			event.setLocation(location);
-			eventRepository.save(event);
+			events.add(event);
 
 			Ticket ticket = new Ticket();
 			ticket.setPrice(Double.parseDouble(RandomStringUtils.randomNumeric(4)));
@@ -51,9 +54,11 @@ public class EventController {
 			participant.setId(j);
 			participant.setTicket(ticket);
 			participant.setEvent(event);
-			participantRepository.save(participant);
+			participants.add(participant);
 			j++;
 		}
+		eventRepository.saveAll(events);
+		participantRepository.saveAll(participants);
 	}
 	
 	@GetMapping("/participant")
